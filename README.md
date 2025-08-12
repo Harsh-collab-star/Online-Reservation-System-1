@@ -1,22 +1,34 @@
 # Online-Reservation-System-1
 
-This Java program implements an online reservation system using a MySQL database. Users can perform various operations like adding reservations, deleting reservations, and viewing all reservations. The project consists of two main classes: Task1 and nested classes user and PnrRecord for handling user and reservation information respectively.
+This is a simple **console-based Railway Reservation System** built in Java using **JDBC** for database connectivity.  
+It allows a user to **insert**, **delete**, and **view** train reservation records stored in a MySQL database.
 
-Usage
-Setup Database:
+---
 
-Modify the url variable in the main method to your desired MySQL database URL.
-Update the database name, username, and password accordingly.
-Run the Program:
+## 📌 Features
+- **User Login**: Authenticate with MySQL username and password.
+- **Insert Record**: Add a new reservation with:
+  - PNR number (auto-generated)
+  - Passenger name
+  - Train number
+  - Class type
+  - Journey date
+  - Starting location
+  - Destination
+- **Delete Record**: Remove a reservation by its PNR number.
+- **View All Records**: Display all reservations stored in the database.
 
-Compile the Java file (Task1.java).
-Run the compiled Java program.
-Program Options:
+---
 
-Upon running the program, you will be prompted to choose an option:
-Insert a new reservation
-Delete an existing reservation
-Show all reservations
-Exit the program
-Contributing
-Feel free to contribute to this project by creating issues, suggesting improvements, or submitting pull requests. Your contributions are greatly appreciated!
+## 🛠️ Technologies Used
+- **Java (JDK 8+)**
+- **MySQL**
+- **JDBC (Java Database Connectivity)**
+
+---
+
+## 📂 Database Setup
+1. **Create Database**
+   ```sql
+   CREATE DATABASE vasu;
+   USE vasu;
