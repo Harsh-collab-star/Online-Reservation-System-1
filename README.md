@@ -25,10 +25,4 @@ It allows a user to **insert**, **delete**, and **view** train reservation recor
 - **MySQL**
 - **JDBC (Java Database Connectivity)**
 
----
 
-## 📂 Database Setup
-1. **Create Database**
-   ```sql
-   CREATE DATABASE vasu;
-   USE vasu;
