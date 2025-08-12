@@ -1,216 +1,156 @@
 import java.sql.*;
-import java.util.Scanner;
-import java.util.Random;
+import java.util.*;
 
-public class Task1 {
-    private static final int min = 1000;
-    private static final int max = 9999;
+public class OnlineReservationSystem {
 
-    public static class user {
-        private String username;
-        private String password;
+    private static final int MIN_PNR = 1000;
+    private static final int MAX_PNR = 9999;
+    private static final Scanner sc = new Scanner(System.in);
 
-        Scanner sc = new Scanner(System.in);
+    // Class to store user credentials
+    static class User {
+        String username;
+        String password;
 
-        public user() {
-        }
-
-        public String getUsername() {
-            System.out.println("Enter Username : ");
+        public void inputCredentials() {
+            System.out.print("Enter MySQL Username: ");
             username = sc.nextLine();
-            return username;
-        }
-
-        public String getPassword() {
-            System.out.println("Enter Password : ");
+            System.out.print("Enter MySQL Password: ");
             password = sc.nextLine();
-            return password;
         }
     }
 
-    public static class PnrRecord {
-        private int pnrNumber;
-        private String passengerName;
-        private String trainNumber;
-        private String classType;
-        private String journeyDate;
-        private String from;
-        private String to;
+    // Class to store reservation details
+    static class Reservation {
+        int pnrNumber;
+        String passengerName;
+        String trainNumber;
+        String classType;
+        String journeyDate;
+        String fromLocation;
+        String toLocation;
 
-        Scanner sc = new Scanner(System.in);
+        public void inputDetails() {
+            Random rand = new Random();
+            pnrNumber = rand.nextInt(MAX_PNR - MIN_PNR + 1) + MIN_PNR;
 
-        public int getpnrNumber() {
-            Random random = new Random();
-            pnrNumber = random.nextInt(max) + min;
-            return pnrNumber;
-        }
-
-        public String getPassengerName() {
-            System.out.println("Enter the passenger name : ");
+            System.out.print("Enter Passenger Name: ");
             passengerName = sc.nextLine();
-            return passengerName;
-        }
-
-        public String gettrainNumber() {
-            System.out.println("Enter the train number : ");
+            System.out.print("Enter Train Number: ");
             trainNumber = sc.nextLine();
-            return trainNumber;
-        }
-
-        public String getclassType() {
-            System.out.println("Enter the class type : ");
+            System.out.print("Enter Class Type: ");
             classType = sc.nextLine();
-            return classType;
-        }
-
-        public String getjourneyDate() {
-            System.out.println("Enter the Journey date as 'YYYY-MM-DD' format");
+            System.out.print("Enter Journey Date (YYYY-MM-DD): ");
             journeyDate = sc.nextLine();
-            return journeyDate;
-        }
-
-        public String getfrom() {
-            System.out.println("Enter the starting place : ");
-            from = sc.nextLine();
-            return from;
-        }
-
-        public String getto() {
-            System.out.println("Enter the destination place :  ");
-            to = sc.nextLine();
-            return to;
+            System.out.print("Enter From Location: ");
+            fromLocation = sc.nextLine();
+            System.out.print("Enter To Location: ");
+            toLocation = sc.nextLine();
         }
     }
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        user u1 = new user();
-        String username = u1.getUsername();
-        String password = u1.getPassword();
+        User user = new User();
+        user.inputCredentials();
 
-        String url = "jdbc:mysql://localhost:3306/vasu"; // change the database as 'vasu' as per your requirement
+        String url = "jdbc:mysql://localhost:3306/harsh_kumar";
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection con = DriverManager.getConnection(url, user.username, user.password)) {
+                System.out.println("\n✅ Connected to database successfully!");
 
-            try (Connection connection = DriverManager.getConnection(url, username, password)) {
-                System.out.println("User Connection Granted.\n");
                 while (true) {
-                    String InsertQuery = "insert into reservations values (?, ?, ?, ?, ?, ?, ?)";
-                    String DeleteQuery = "DELETE FROM reservations WHERE pnr_number = ?";
-                    String ShowQuery = "Select * from reservations";
+                    System.out.println("\n----- ONLINE RESERVATION SYSTEM -----");
+                    System.out.println("1. Insert Reservation");
+                    System.out.println("2. Delete Reservation");
+                    System.out.println("3. Show All Reservations");
+                    System.out.println("4. Exit");
+                    System.out.print("Enter your choice: ");
 
-                    System.out.println("Enter the choice : ");
-                    System.out.println("1. Insert Record.\n");
-                    System.out.println("2. Delete Record.\n");
-                    System.out.println("3. Show All Records.\n");
-                    System.out.println("4. Exit.\n");
-                    int choice = sc.nextInt();
+                    int choice = Integer.parseInt(sc.nextLine());
 
-                    if (choice == 1) {
-
-                        PnrRecord p1 = new PnrRecord();
-                        int pnr_number = p1.getpnrNumber();
-                        String passengerName = p1.getPassengerName();
-                        String trainNumber = p1.gettrainNumber();
-                        String classType = p1.getclassType();
-                        String journeyDate = p1.getjourneyDate();
-                        String getfrom = p1.getfrom();
-                        String getto = p1.getto();
-
-                        try (PreparedStatement preparedStatement = connection.prepareStatement(InsertQuery)) {
-                            preparedStatement.setInt(1, pnr_number);
-                            preparedStatement.setString(2, passengerName);
-                            preparedStatement.setString(3, trainNumber);
-                            preparedStatement.setString(4, classType);
-                            preparedStatement.setString(5, journeyDate);
-                            preparedStatement.setString(6, getfrom);
-                            preparedStatement.setString(7, getto);
-
-                            int rowsAffected = preparedStatement.executeUpdate();
-                            if (rowsAffected > 0) {
-                                System.out.println("Record added successfully.");
-                            }
-
-                            else {
-                                System.out.println("No records were added.");
-                            }
-                        }
-
-                        catch (SQLException e) {
-                            System.err.println("SQLException: " + e.getMessage());
-                        }
-
-                    }
-
-                    else if (choice == 2) {
-                        System.out.println("Enter the PNR number to delete the record : ");
-                        int pnrNumber = sc.nextInt();
-                        try (PreparedStatement preparedStatement = connection.prepareStatement(DeleteQuery)) {
-                            preparedStatement.setInt(1, pnrNumber);
-                            int rowsAffected = preparedStatement.executeUpdate();
-
-                            if (rowsAffected > 0) {
-                                System.out.println("Record deleted successfully.");
-                            }
-
-                            else {
-                                System.out.println("No records were deleted.");
-                            }
-                        }
-
-                        catch (SQLException e) {
-                            System.err.println("SQLException: " + e.getMessage());
-                        }
-                    }
-
-                    else if (choice == 3) {
-                        try (PreparedStatement preparedStatement = connection.prepareStatement(ShowQuery);
-                                ResultSet resultSet = preparedStatement.executeQuery()) {
-                            System.out.println("\nAll records printing.\n");
-                            while (resultSet.next()) {
-                                String pnrNumber = resultSet.getString("pnr_number");
-                                String passengerName = resultSet.getString("passenger_name");
-                                String trainNumber = resultSet.getString("train_number");
-                                String classType = resultSet.getString("class_type");
-                                String journeyDate = resultSet.getString("journey_date");
-                                String fromLocation = resultSet.getString("from_location");
-                                String toLocation = resultSet.getString("to_location");
-
-                                System.out.println("PNR Number: " + pnrNumber);
-                                System.out.println("Passenger Name: " + passengerName);
-                                System.out.println("Train Number: " + trainNumber);
-                                System.out.println("Class Type: " + classType);
-                                System.out.println("Journey Date: " + journeyDate);
-                                System.out.println("From Location: " + fromLocation);
-                                System.out.println("To Location: " + toLocation);
-                                System.out.println("--------------");
-                            }
-                        } catch (SQLException e) {
-                            System.err.println("SQLException: " + e.getMessage());
-                        }
-                    }
-
-                    else if (choice == 4) {
-                        System.out.println("Exiting the program.\n");
-                        break;
-                    }
-
-                    else {
-                        System.out.println("Invalid Choice Entered.\n");
+                    switch (choice) {
+                        case 1:
+                            insertReservation(con);
+                            break;
+                        case 2:
+                            deleteReservation(con);
+                            break;
+                        case 3:
+                            showReservations(con);
+                            break;
+                        case 4:
+                            System.out.println("🚪 Exiting...");
+                            return;
+                        default:
+                            System.out.println("❌ Invalid choice! Try again.");
                     }
                 }
-
             }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
 
-            catch (SQLException e) {
-                System.err.println("SQLException: " + e.getMessage());
+    private static void insertReservation(Connection con) {
+        Reservation res = new Reservation();
+        res.inputDetails();
+
+        String sql = "INSERT INTO reservations VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, res.pnrNumber);
+            pst.setString(2, res.passengerName);
+            pst.setString(3, res.trainNumber);
+            pst.setString(4, res.classType);
+            pst.setString(5, res.journeyDate);
+            pst.setString(6, res.fromLocation);
+            pst.setString(7, res.toLocation);
+
+            int rows = pst.executeUpdate();
+            if (rows > 0) {
+                System.out.println("✅ Reservation Added! PNR: " + res.pnrNumber);
             }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
         }
+    }
 
-        catch (ClassNotFoundException e) {
-            System.err.println("Error loading JDBC driver: " + e.getMessage());
+    private static void deleteReservation(Connection con) {
+        System.out.print("Enter PNR Number to delete: ");
+        int pnr = Integer.parseInt(sc.nextLine());
+
+        String sql = "DELETE FROM reservations WHERE pnr_number = ?";
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, pnr);
+            int rows = pst.executeUpdate();
+            if (rows > 0) {
+                System.out.println("✅ Reservation Deleted!");
+            } else {
+                System.out.println("❌ No record found with that PNR.");
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
         }
+    }
 
-        sc.close();
+    private static void showReservations(Connection con) {
+        String sql = "SELECT * FROM reservations";
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            System.out.println("\n📋 All Reservations:");
+            while (rs.next()) {
+                System.out.println("---------------------------");
+                System.out.println("PNR Number: " + rs.getInt("pnr_number"));
+                System.out.println("Passenger Name: " + rs.getString("passenger_name"));
+                System.out.println("Train Number: " + rs.getString("train_number"));
+                System.out.println("Class Type: " + rs.getString("class_type"));
+                System.out.println("Journey Date: " + rs.getDate("journey_date"));
+                System.out.println("From: " + rs.getString("from_location"));
+                System.out.println("To: " + rs.getString("to_location"));
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
     }
 }
